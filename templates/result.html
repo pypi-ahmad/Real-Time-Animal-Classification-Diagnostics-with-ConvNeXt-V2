@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Classification Result</title>
+</head>
+<body>
+    <h1>Image Classification Result</h1>
+    <p>Predicted Class: {{ prediction }}</p>
+    <!-- Use the 'safe' filter to render HTML content within the image tag -->
+    <img src="{{ image|safe }}" alt="Uploaded Image">
+    <br>
+    <a href="/" class="btn btn-primary">Return to Homepage</a>
+</body>
+</html>
