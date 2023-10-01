@@ -10,6 +10,7 @@ This project is a Flask web application for classifying animal images into 10 ca
   - [Installation](#installation)
 - [Usage](#usage)
 - [Customization](#customization)
+- [Results](#results)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
 
@@ -43,12 +44,11 @@ Before you begin, ensure you have the following prerequisites installed on your 
 - Python 3.x
 - Flask
 - TensorFlow (for the VGG16 model)
-- Flask-Uploads (for handling file uploads)
 
 You can install the required Python packages using pip:
 
 ```bash
-pip install Flask tensorflow flask-uploads
+pip install Flask tensorflow
 ```
 
 ### Installation
@@ -91,9 +91,27 @@ The app should now be accessible at http://127.0.0.1:5000/ in your web browser.
 
 You can customize the app to fit your specific needs:
 
-- **Replace the Model**: If needed, replace the "vgg16_model.h5" file with your custom-trained model.
+- **Replace the Model**: If needed, replace the "my_model.h5" file with your custom-trained model.
 - **Update Class Labels**: Modify the class labels in `app.py` to match your classification problem.
 - **Enhance User Interface**: Customize the HTML templates in the "templates" folder to improve the user interface.
+
+## Results
+
+### Accuracy Curve
+
+![Accuracy Curve](accuracy_curve.png)
+
+### Loss Curve
+
+![Loss Curve](loss_curve.png)
+
+### Confusion Matrix
+
+![Confusion Matrix](confusion_matrix.png)
+
+### Accuracy, Precision, and Recall
+
+![Metrics](Accuracy,%20Precision,%20and%20Recall.png)
 
 ## License
 
