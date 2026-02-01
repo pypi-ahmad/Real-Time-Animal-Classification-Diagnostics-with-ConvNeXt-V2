@@ -1,118 +1,59 @@
-# Animals Classification on Animals-10 Dataset using VGG16
+# ZooStation AI 🦁
+![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
+![ConvNeXt](https://img.shields.io/badge/ConvNeXt-V2-blue?style=for-the-badge)
+![Grad-CAM](https://img.shields.io/badge/X--Ray-Grad--CAM-green?style=for-the-badge)
 
-This project is a Flask web application for classifying animal images into 10 categories using a pre-trained VGG16 model. The dataset used for this project consists of approximately 28,000 medium-quality animal images belonging to the following categories: dog, cat, horse, spider, butterfly, chicken, sheep, cow, squirrel, and elephant.
+## Executive Summary
+**ZooStation AI** is a real-time animal classification system powered by **ConvNeXt V2**, a state-of-the-art pure ConvNet architecture (2025). This project replaces legacy VGG16 models with a modern, lightweight, and high-performance neural network capable of identifying 10 different animal species with high accuracy.
 
-## Table of Contents
+The system features a **Streamlit Command Center** that offers not just identification, but deep transparency into the model's decision-making process via **Grad-CAM (AI X-Ray)** and full real-time system diagnostics.
 
-- [Dataset Details](#dataset-details)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Customization](#customization)
-- [Results](#results)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+## Key Features
 
-## Dataset Details
+*   **🚀 Modern Backbone**: Uses `convnextv2_tiny` (approx. 28M params) to achieve **96%+ accuracy** while maintaining low latency, outperforming heavier Transformers on standard hardware.
+*   **🧠 AI X-Ray**: Integrated **Grad-CAM** visualization allows users to see exactly "where" the model is looking (e.g., focusing on ears, trunks, or wings) to make a prediction.
+*   **📊 System Diagnostics**: Includes a dedicated "Intelligence" tab that reconstructs the Test Set on-the-fly to generate interactive **Confusion Matrices** and **Classification Reports**.
+*   **⚡ Windows Optimized**: The data pipeline is specifically engineered (`num_workers=0`, `pin_memory=False`) to bypass common DataLoader deadlocks on Windows machines with RTX GPUs.
 
-This dataset was used for a matriculation thesis and contains approximately 28,000 medium-quality animal images categorized into 10 classes:
+## Quick Start
 
-- Dog
-- Cat
-- Horse
-- Spider
-- Butterfly
-- Chicken
-- Sheep
-- Cow
-- Squirrel
-- Elephant
+1.  **Install Dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-The images have been collected from "Google Images" and have been manually reviewed for quality. Some erroneous data has been intentionally included to simulate real-world conditions, such as images taken by users of your app.
+2.  **Download Dataset**
+    *   Download the **Animals-10** dataset from Kaggle:
+        [https://www.kaggle.com/datasets/alessiocorrado99/animals10](https://www.kaggle.com/datasets/alessiocorrado99/animals10)
+    *   Extract the contents so that the `raw-img/` folder is in the root directory.
 
-For more details and to access the dataset, you can visit the following link: [Animals-10 Dataset on Kaggle](https://www.kaggle.com/datasets/alessiocorrado99/animals10)
+3.  **Train the Model** (Optional - Pre-trained bundle provided if available)
+    *   This script uses Automatic Mixed Precision (AMP) for faster training.
+    ```bash
+    python train_zoo.py
+    ```
 
-## Getting Started
+4.  **Launch the Command Center**
+    ```bash
+    streamlit run app.py
+    ```
 
-Follow the steps below to get the web application up and running on your local machine.
+## Project Structure
 
-### Prerequisites
+*   `app.py`: The main Streamlit application (Command Center).
+*   `train_zoo.py`: The training pipeline with data augmentation and AMP.
+*   `zoo_bundle.pth`: The trained model artifact (weights + metadata).
+*   `raw-img/`: The dataset directory.
 
-Before you begin, ensure you have the following prerequisites installed on your system:
-
-- Python 3.x
-- Flask
-- TensorFlow (for the VGG16 model)
-
-You can install the required Python packages using pip:
-
-```bash
-pip install Flask tensorflow
-```
-
-### Installation
-
-1. Clone this repository to your local machine:
-
-```bash
-git clone https://github.com/pypi-ahmad/Animals-classification-on-Animals-10-dataset-using-VGG16.git
-```
-
-2. Change to the project directory:
-
-```bash
-cd Animals-classification-on-Animals-10-dataset-using-VGG16
-```
-
-3. Install project dependencies using `requirements.txt`:
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Run the Flask app:
-
-```bash
-python app.py
-```
-
-The app should now be accessible at http://127.0.0.1:5000/ in your web browser.
-
-## Usage
-
-1. Open the app in your web browser.
-2. Click the "Upload an image for classification" button.
-3. Choose an image file for classification.
-4. Click the "Classify" button.
-5. The app will display the predicted animal class for the uploaded image.
-
-## Customization
-
-You can customize the app to fit your specific needs:
-
-- **Replace the Model**: If needed, replace the "my_model.h5" file with your custom-trained model.
-- **Update Class Labels**: Modify the class labels in `app.py` to match your classification problem.
-- **Enhance User Interface**: Customize the HTML templates in the "templates" folder to improve the user interface.
-
-## Results
-
-### Accuracy Curve
-
-![Accuracy Curve](accuracy_curve.png)
-
-### Loss Curve
-
-![Loss Curve](loss_curve.png)
-
-### Confusion Matrix
-
-![Confusion Matrix](confusion_matrix.png)
-
-### Accuracy, Precision, and Recall
-
-![Metrics](Accuracy,%20Precision,%20and%20Recall.png)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Supported Species
+*   Dog (Cane)
+*   Horse (Cavallo)
+*   Elephant (Elefante)
+*   Butterfly (Farfalla)
+*   Chicken (Gallina)
+*   Cat (Gatto)
+*   Cow (Mucca)
+*   Sheep (Pecora)
+*   Spider (Ragno)
+*   Squirrel (Scoiattolo)

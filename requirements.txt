@@ -1,8 +1,14 @@
-Flask
-tensorflow
-numpy
-pandas
-matplotlib
-seaborn
+--extra-index-url https://download.pytorch.org/whl/cu130
+torch
+torchvision
+timm
+streamlit
+opencv-python-headless
+albumentations
 scikit-learn
-Pillow
+grad-cam
+matplotlib
+pillow
+pandas
+scikit-learn
+plotly

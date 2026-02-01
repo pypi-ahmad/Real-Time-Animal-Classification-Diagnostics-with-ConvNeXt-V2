@@ -1,0 +1,27 @@
+# Dataset
+raw-img/
+Test Images/
+uploads/
+
+# Models
+*.pth
+*.h5
+*.keras
+
+# Environment & Python
+__pycache__/
+.venv/
+.env
+*.pyc
+
+# Archives
+*.zip
+*.rar
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/
