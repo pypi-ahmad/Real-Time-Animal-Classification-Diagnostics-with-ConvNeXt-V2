@@ -2,6 +2,7 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from contextlib import nullcontext
 from torch.utils.data import DataLoader, random_split, Dataset
 from torchvision import datasets, transforms
 import timm
@@ -87,7 +88,7 @@ def main():
     std = [0.229, 0.224, 0.225]
 
     train_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
+        transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BILINEAR),
         transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(15),
         transforms.ToTensor(),
@@ -95,7 +96,7 @@ def main():
     ])
 
     eval_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
+        transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BILINEAR),
         transforms.ToTensor(),
         transforms.Normalize(mean, std)
     ])
@@ -153,7 +154,8 @@ def main():
     optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE)
     
     # Mixed Precision Scaler for faster training on Tensor Cores
-    scaler = torch.amp.GradScaler('cuda')
+    amp_enabled = DEVICE.type == 'cuda'
+    scaler = torch.amp.GradScaler('cuda', enabled=amp_enabled)
 
     # 3. Training Loop
     best_val_loss = float('inf')
@@ -178,7 +180,8 @@ def main():
             optimizer.zero_grad()
             
             # AMP Context: Automatic Mixed Precision for speed and memory efficiency
-            with torch.amp.autocast('cuda'):
+            amp_context = torch.amp.autocast(device_type='cuda', enabled=amp_enabled) if amp_enabled else nullcontext()
+            with amp_context:
                 outputs = model(images)
                 loss = criterion(outputs, labels)
             
@@ -211,7 +214,8 @@ def main():
                 labels = labels.to(DEVICE, non_blocking=True)
                 
                 # AMP Context (optional for val, but good practice for consistency)
-                with torch.amp.autocast('cuda'):
+                amp_context = torch.amp.autocast(device_type='cuda', enabled=amp_enabled) if amp_enabled else nullcontext()
+                with amp_context:
                     outputs = model(images)
                     loss = criterion(outputs, labels)
                 
@@ -247,13 +251,14 @@ def main():
     # 4. Final Evaluation & Artifacts
     print("Loading best model for testing...")
     if os.path.exists('best_model_temp.pth'):
-        model.load_state_dict(torch.load('best_model_temp.pth', map_location=DEVICE))
+        model.load_state_dict(torch.load('best_model_temp.pth', map_location=DEVICE, weights_only=True))
+    else:
+        raise FileNotFoundError("Expected 'best_model_temp.pth' after training, but it was not found.")
     
     model.eval()
     test_preds, test_targets = [], []
     with torch.no_grad():
         for images, labels in tqdm(test_loader, desc="Testing"):
-            if len(images) == 0: continue
             images = images.to(DEVICE)
             outputs = model(images)
             preds = torch.argmax(outputs, dim=1)

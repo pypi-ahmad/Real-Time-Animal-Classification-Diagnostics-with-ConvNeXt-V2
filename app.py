@@ -1,6 +1,5 @@
 import streamlit as st
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader, random_split, Dataset
 from torchvision import datasets, transforms
 import timm
@@ -105,7 +104,7 @@ def load_zoo_model():
     
     # Load Weights
     try:
-        checkpoint = torch.load('zoo_bundle.pth', map_location=DEVICE)
+        checkpoint = torch.load('zoo_bundle.pth', map_location=DEVICE, weights_only=True)
         model.load_state_dict(checkpoint['model_state'])
         class_names = checkpoint['class_names']
     except FileNotFoundError:
@@ -122,7 +121,7 @@ def load_zoo_model():
 model, class_names = load_zoo_model()
 
 # --- Data Loading for Diagnostics ---
-@st.cache_data
+@st.cache_resource
 def load_test_data():
     """
     Re-creates the Test Split exactly as done in training to prevent data leakage.
@@ -142,7 +141,7 @@ def load_test_data():
     std = [0.229, 0.224, 0.225]
     
     eval_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
+        transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BILINEAR),
         transforms.ToTensor(),
         transforms.Normalize(mean, std)
     ])
@@ -196,21 +195,18 @@ with tab1:
         
         if uploaded_file is not None:
             image_pil = Image.open(uploaded_file).convert('RGB')
-            st.image(image_pil, caption="Source Image", use_container_width=True)
+            st.image(image_pil, caption="Source Image", width="stretch")
             
     with col_result:
         if uploaded_file is not None and model is not None:
             # Preprocess
-            img_resized = image_pil.resize((224, 224))
-            img_np = np.array(img_resized) / 255.0
-            
-            # Normalize
-            mean = np.array([0.485, 0.456, 0.406])
-            std = np.array([0.229, 0.224, 0.225])
-            img_norm = (img_np - mean) / std
-            
-            # Tensor
-            img_tensor = torch.tensor(img_norm, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0).to(DEVICE)
+            infer_transform = transforms.Compose([
+                transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BILINEAR),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])
+            img_tensor = infer_transform(image_pil).unsqueeze(0).to(DEVICE)
+            img_np = np.array(image_pil.resize((224, 224), resample=Image.BILINEAR)) / 255.0
             
             # Predict
             with torch.no_grad():
@@ -246,7 +242,7 @@ with tab1:
                     grayscale_cam = grayscale_cam[0, :]
                     
                     visualization = show_cam_on_image(img_np, grayscale_cam, use_rgb=True)
-                    st.image(visualization, caption=f"Attention Map for {pred_class}", use_container_width=True)
+                    st.image(visualization, caption=f"Attention Map for {pred_class}", width="stretch")
                     st.info("The heatmap shows where the Neural Network is 'looking' to make its decision.")
                 except Exception as e:
                     st.error(f"X-Ray module unavailable: {e}")
@@ -258,7 +254,7 @@ with tab2:
     st.header("System Diagnostics & Performance Metrics")
     
     if st.button("🚀 Run Full System Diagnostics"):
-        test_loader, dataset_classes = load_test_data()
+        test_loader, _ = load_test_data()
         
         if test_loader is None:
             st.error(f"Dataset not found at {DATA_DIR}. Cannot run diagnostics.")
@@ -368,8 +364,8 @@ with tab3:
             with col:
                 try:
                     img = Image.open(img_path)
-                    st.image(img, caption=species, use_container_width=True)
-                except:
+                    st.image(img, caption=species, width="stretch")
+                except Exception:
                     st.error(f"Error loading {species}")
                     
     else:
